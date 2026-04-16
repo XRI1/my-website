@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>⚽ KICK OFF</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --gold:#f6c90e;--red:#e53e3e;--blue:#3182ce;
+  --dark:#080c14;--card:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.11);--text:#e8f0ff;--muted:#6677aa;--r:13px;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--dark);
+  font-family:'Rajdhani',system-ui,sans-serif;color:var(--text);touch-action:none;user-select:none;}
+canvas{position:fixed;inset:0;}
+
+/* OVERLAY */
+#OV{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.93);overflow-y:auto;}
+#OV.H{display:none;}
+.SCR{display:none;flex-direction:column;align-items:center;width:100%;max-width:480px;
+  padding:20px 16px 32px;gap:0;}
+.SCR.A{display:flex;}
+
+.LOGO{font-family:'Orbitron',monospace;font-size:clamp(28px,7vw,50px);font-weight:900;
+  color:var(--gold);letter-spacing:4px;text-align:center;}
+.SUB{font-size:11px;letter-spacing:3px;color:var(--muted);margin:5px 0 22px;text-transform:uppercase;}
+.CARD{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;width:100%;margin-bottom:12px;}
+.CL{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.MB{width:100%;padding:14px 16px;border-radius:11px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;
+  font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:14px;
+  margin-bottom:10px;transition:background .15s,border-color .15s;}
+.MB:hover{background:rgba(246,201,14,0.1);border-color:rgba(246,201,14,0.3);}
+.MB .IC{font-size:22px;flex-shrink:0;}
+.MB .DS{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500;}
+.GB{width:100%;padding:14px;border-radius:11px;border:none;background:var(--gold);
+  color:#000;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:2px;
+  cursor:pointer;margin-top:4px;transition:filter .15s,transform .1s;}
+.GB:hover{filter:brightness(1.1);}
+.GB:active{transform:scale(0.97);}
+.GB:disabled{background:#2a2a2a;color:#555;cursor:not-allowed;filter:none;}
+.BB{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;
+  padding:4px 0;margin-bottom:12px;align-self:flex-start;font-family:'Rajdhani',sans-serif;font-weight:600;}
+.BB:hover{color:var(--text);}
+.PILLS{display:flex;gap:6px;flex-wrap:wrap;}
+.PILL{flex:1;min-width:44px;padding:8px 4px;border-radius:7px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;text-align:center;transition:all .15s;}
+.PILL.ON{background:var(--gold);color:#000;border-color:var(--gold);}
+.INP{width:100%;padding:11px 14px;border-radius:9px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.07);color:var(--text);font-size:15px;outline:none;
+  font-family:'Rajdhani',sans-serif;font-weight:600;transition:border-color .15s;margin-bottom:10px;}
+.INP:focus{border-color:var(--gold);}
+.INP::placeholder{color:#334;}
+.INP:last-child{margin-bottom:0;}
+.CDINP{text-transform:uppercase;font-size:28px;letter-spacing:10px;text-align:center;
+  font-family:'Orbitron',monospace;font-weight:700;}
+
+/* TEAM SELECTOR */
+.TSEL{display:flex;gap:10px;width:100%;}
+.TBTN{flex:1;padding:14px 8px;border-radius:10px;border:2px solid var(--border);
+  background:rgba(255,255,255,0.04);cursor:pointer;text-align:center;transition:all .15s;font-family:'Rajdhani',sans-serif;}
+.TBTN.RA{border-color:#e53e3e;background:rgba(229,62,62,0.15);}
+.TBTN.BA{border-color:#3182ce;background:rgba(49,130,206,0.15);}
+.TBTN .TN{font-size:16px;font-weight:700;margin-top:4px;}
+.TBTN .TS{font-size:11px;color:var(--muted);}
+
+/* STATUS BOX */
+.SBOX{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:11px;
+  padding:16px;text-align:center;width:100%;margin-bottom:12px;}
+.RC{font-family:'Orbitron',monospace;font-size:clamp(32px,9vw,52px);font-weight:900;
+  color:var(--gold);letter-spacing:12px;margin:8px 0;}
+.CB{padding:8px 20px;border-radius:7px;border:1px solid var(--gold);background:transparent;
+  color:var(--gold);font-size:13px;cursor:pointer;margin-top:6px;font-family:'Rajdhani',sans-serif;font-weight:600;}
+.SM{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* LOBBY PLAYER LIST */
+.LOBBY{width:100%;display:flex;flex-direction:column;gap:6px;}
+.LP{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:9px;border:1px solid var(--border);background:var(--card);}
+.LD{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.LN{font-size:14px;font-weight:700;}
+.LT{font-size:11px;color:var(--muted);margin-top:1px;}
+.LY{margin-left:auto;font-size:11px;padding:3px 8px;border-radius:4px;font-weight:700;}
+
+/* HUD */
+#HUD{position:fixed;top:0;left:0;width:100%;z-index:20;display:none;pointer-events:none;}
+.HB{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.85);padding:7px 14px;backdrop-filter:blur(6px);}
+.HT{display:flex;align-items:center;gap:8px;}
+.HN{font-size:clamp(10px,2.5vw,13px);font-weight:700;letter-spacing:1px;max-width:95px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-transform:uppercase;}
+.HS{font-family:'Orbitron',monospace;font-size:clamp(20px,5.5vw,34px);font-weight:900;color:var(--gold);min-width:24px;text-align:center;}
+.HTM{font-family:'Orbitron',monospace;font-size:clamp(13px,3.5vw,20px);font-weight:700;color:#7ec8e3;min-width:54px;text-align:center;}
+#MYINFO{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:20;pointer-events:none;display:none;}
+.MI{display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,0.8);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;}
+.MDOT{width:9px;height:9px;border-radius:50%;}
+
+/* GOAL */
+#GOAL{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);pointer-events:none;}
+.GB2{background:rgba(0,0,0,0.93);border:3px solid var(--gold);border-radius:20px;padding:22px 48px;text-align:center;animation:gp .3s ease;}
+@keyframes gp{from{transform:scale(0.4);opacity:0;}to{transform:scale(1);opacity:1;}}
+.GT{font-family:'Orbitron',monospace;font-size:clamp(36px,9vw,62px);font-weight:900;color:var(--gold);}
+.GW{font-size:clamp(14px,3.5vw,20px);color:#fff;margin-top:6px;font-family:'Rajdhani',sans-serif;font-weight:700;}
+
+/* MOBILE CTRL */
+#CTRL{position:fixed;bottom:0;left:0;width:100%;z-index:20;display:none;padding:6px 10px 14px;}
+.CR{display:flex;justify-content:space-between;align-items:flex-end;}
+.DP{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.DB{width:clamp(46px,13vw,60px);height:clamp(46px,13vw,60px);border-radius:50%;border:2px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.7);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.DB.DN{background:rgba(246,201,14,0.28);border-color:var(--gold);}
+.DBX{width:clamp(46px,13vw,60px);height:clamp(46px,13vw,60px);}
+.AC{display:flex;flex-direction:column;gap:8px;align-items:center;}
+.KB{width:clamp(62px,17vw,76px);height:clamp(62px,17vw,76px);border-radius:50%;border:2.5px solid var(--gold);background:rgba(180,130,0,0.2);color:var(--gold);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Orbitron',monospace;}
+.KB.DN{background:rgba(246,201,14,0.42);}
+.SB{width:clamp(46px,13vw,58px);height:clamp(46px,13vw,58px);border-radius:50%;border:2px solid #5dcaa5;background:rgba(0,60,40,0.3);color:#5dcaa5;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Orbitron',monospace;}
+.SB.DN{background:rgba(50,160,100,0.42);}
+
+/* END */
+#END{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:50;}
+.EF{font-family:'Orbitron',monospace;font-size:clamp(14px,4vw,22px);color:var(--muted);letter-spacing:3px;}
+.ES{font-family:'Orbitron',monospace;font-size:clamp(44px,13vw,78px);font-weight:900;color:#fff;}
+.EW{font-size:clamp(15px,4vw,22px);font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;}
+.EB{padding:14px 40px;border-radius:11px;border:none;background:var(--gold);color:#000;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:2px;margin-top:10px;}
+
+#PING{position:fixed;bottom:90px;right:10px;font-size:10px;padding:4px 8px;border-radius:5px;background:rgba(0,0,0,0.78);color:var(--muted);z-index:21;display:none;font-family:'Rajdhani',sans-serif;font-weight:600;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+<canvas id="C"></canvas>
+
+<div id="OV">
+
+<!-- MAIN MENU -->
+<div class="SCR A" id="sMain">
+  <div class="LOGO">⚽ KICK OFF</div>
+  <div class="SUB">True Multiplayer Football</div>
+  <button class="MB" onclick="go('sOnline')">
+    <span class="IC">🌐</span>
+    <div><div>Create / Join Room</div><div class="DS">Each player joins from their own device · up to 5v5</div></div>
+  </button>
+  <button class="MB" onclick="go('sLocal')">
+    <span class="IC">🖥️</span>
+    <div><div>Local — Same Device</div><div class="DS">Split keyboard controls on one screen</div></div>
+  </button>
+  <div class="CARD" style="margin-top:4px;">
+    <div class="CL">How Online Works</div>
+    <div style="font-size:12px;color:var(--muted);line-height:2;">
+      1. Host creates a room → gets a 4-letter code<br>
+      2. Each player opens this file on their own device<br>
+      3. Everyone enters the code + their name<br>
+      4. Pick Red or Blue team<br>
+      5. Host starts the match — everyone plays!
+    </div>
+  </div>
+</div>
+
+<!-- ONLINE LOBBY -->
+<div class="SCR" id="sOnline">
+  <button class="BB" onclick="go('sMain')">← Back</button>
+  <div class="LOGO" style="font-size:clamp(22px,6vw,36px);">Join or Create</div>
+  <div class="SUB" style="margin-bottom:18px;">Each player on their own device</div>
+  <div class="CARD">
+    <div class="CL">Your Name</div>
+    <input class="INP" id="myName" placeholder="Enter your name" maxlength="14" style="margin-bottom:0;">
+  </div>
+  <button class="MB" onclick="goCreate()">
+    <span class="IC">🏟️</span>
+    <div><div>Create Room</div><div class="DS">You become the host — share the code</div></div>
+  </button>
+  <button class="MB" onclick="go('sJoin')">
+    <span class="IC">🔗</span>
+    <div><div>Join Room</div><div class="DS">Enter a friend's room code</div></div>
+  </button>
+</div>
+
+<!-- CREATE -->
+<div class="SCR" id="sCreate">
+  <button class="BB" onclick="go('sOnline')">← Back</button>
+  <div class="LOGO" style="font-size:clamp(20px,5vw,30px);">Create Room</div>
+  <div class="SUB" style="margin-bottom:18px;">Set up the match</div>
+  <div class="CARD">
+    <div class="CL">Team Size (per side)</div>
+    <div class="PILLS" id="cMP">
+      <div class="PILL ON" data-v="1">1v1</div>
+      <div class="PILL" data-v="2">2v2</div>
+      <div class="PILL" data-v="3">3v3</div>
+      <div class="PILL" data-v="4">4v4</div>
+      <div class="PILL" data-v="5">5v5</div>
+    </div>
+  </div>
+  <div class="CARD">
+    <div class="CL">Match Duration</div>
+    <div class="PILLS" id="cTP">
+      <div class="PILL ON" data-v="120">2 min</div>
+      <div class="PILL" data-v="300">5 min</div>
+      <div class="PILL" data-v="600">10 min</div>
+    </div>
+  </div>
+  <div class="CARD">
+    <div class="CL">Your Team</div>
+    <div class="TSEL">
+      <div class="TBTN RA" id="tRA" onclick="pickTeam('A')">
+        <div style="font-size:22px;">🔴</div>
+        <div class="TN" style="color:#f87171;">Red Team</div>
+        <div class="TS">Attack Left→Right</div>
+      </div>
+      <div class="TBTN" id="tRB" onclick="pickTeam('B')">
+        <div style="font-size:22px;">🔵</div>
+        <div class="TN" style="color:#60a5fa;">Blue Team</div>
+        <div class="TS">Attack Right→Left</div>
+      </div>
+    </div>
+  </div>
+  <button class="GB" onclick="createRoom()">CREATE ROOM</button>
+</div>
+
+<!-- WAITING (HOST) -->
+<div class="SCR" id="sWait">
+  <div class="LOGO" style="font-size:clamp(18px,5vw,28px);margin-bottom:8px;">Room Ready</div>
+  <div class="SUB" style="margin-bottom:14px;">Share this code — others open this file and join</div>
+  <div class="SBOX">
+    <div class="SM" id="wMsg">Setting up...</div>
+    <div class="RC" id="wCode" style="display:none;"></div>
+    <button class="CB" id="wCopy" style="display:none;" onclick="copyCode()">📋 Copy Code</button>
+  </div>
+  <div class="CARD">
+    <div class="CL">Players in Lobby (<span id="pCount">1</span> / <span id="pMax">2</span>)</div>
+    <div class="LOBBY" id="lobbyList"></div>
+  </div>
+  <div id="wSW" style="width:100%;margin-top:4px;">
+    <button class="GB" id="startBtn" onclick="hostStart()" disabled>Waiting for players...</button>
+  </div>
+  <button class="BB" style="margin-top:14px;" onclick="leaveRoom()">← Leave Room</button>
+</div>
+
+<!-- JOIN -->
+<div class="SCR" id="sJoin">
+  <button class="BB" onclick="go('sOnline')">← Back</button>
+  <div class="LOGO" style="font-size:clamp(20px,5vw,30px);">Join Room</div>
+  <div class="SUB" style="margin-bottom:18px;">Enter the host's 4-letter code</div>
+  <div class="CARD">
+    <input class="INP CDINP" id="jCode" placeholder="ABCD" maxlength="4">
+    <div class="CL" style="margin-top:12px;">Your Team</div>
+    <div class="TSEL">
+      <div class="TBTN" id="jTA" onclick="jPickTeam('A')">
+        <div style="font-size:20px;">🔴</div>
+        <div class="TN" style="color:#f87171;">Red</div>
+      </div>
+      <div class="TBTN BA" id="jTB" onclick="jPickTeam('B')">
+        <div style="font-size:20px;">🔵</div>
+        <div class="TN" style="color:#60a5fa;">Blue</div>
+      </div>
+    </div>
+  </div>
+  <button class="GB" id="jBtn" onclick="joinRoom()">JOIN GAME</button>
+  <div id="jStat" style="margin-top:12px;font-size:13px;color:#f87171;text-align:center;min-height:20px;font-family:'Rajdhani',sans-serif;font-weight:600;"></div>
+</div>
+
+<!-- GUEST WAITING -->
+<div class="SCR" id="sGWait">
+  <div class="LOGO" style="font-size:clamp(18px,5vw,26px);margin-bottom:8px;">Joined!</div>
+  <div class="SUB" style="margin-bottom:14px;">Waiting for host to start...</div>
+  <div class="SBOX" id="gWaitBox">
+    <div class="SM" id="gWMsg">Connected to room...</div>
+  </div>
+  <div class="CARD">
+    <div class="CL">Players in Lobby</div>
+    <div class="LOBBY" id="gLobbyList"></div>
+  </div>
+  <button class="BB" style="margin-top:14px;" onclick="leaveRoom()">← Leave</button>
+</div>
+
+<!-- LOCAL -->
+<div class="SCR" id="sLocal">
+  <button class="BB" onclick="go('sMain')">← Back</button>
+  <div class="LOGO" style="font-size:clamp(20px,5vw,30px);">Local Match</div>
+  <div class="SUB" style="margin-bottom:18px;">Split keyboard — each player has own keys</div>
+  <div class="CARD">
+    <div class="CL">Team Size</div>
+    <div class="PILLS" id="lMP">
+      <div class="PILL ON" data-v="1">1v1</div>
+      <div class="PILL" data-v="2">2v2</div>
+      <div class="PILL" data-v="3">3v3</div>
+      <div class="PILL" data-v="4">4v4</div>
+      <div class="PILL" data-v="5">5v5</div>
+    </div>
+  </div>
+  <div class="CARD">
+    <div class="CL">Duration</div>
+    <div class="PILLS" id="lTP">
+      <div class="PILL ON" data-v="120">2 min</div>
+      <div class="PILL" data-v="300">5 min</div>
+      <div class="PILL" data-v="600">10 min</div>
+    </div>
+  </div>
+  <div class="CARD">
+    <div class="CL">Player Names</div>
+    <div id="lNames"></div>
+  </div>
+  <div class="CARD">
+    <div class="CL">Controls Reference</div>
+    <div style="font-size:11px;color:var(--muted);line-height:2.2;" id="ctrlRef"></div>
+  </div>
+  <button class="GB" onclick="startLocal()">KICK OFF!</button>
+</div>
+
+</div><!-- /OV -->
+
+<div id="HUD">
+  <div class="HB">
+    <div class="HT">
+      <span class="HN" id="hTA" style="color:#f87171;">RED</span>
+      <span class="HS" id="hSA">0</span>
+    </div>
+    <span class="HTM" id="hTim">2:00</span>
+    <div class="HT">
+      <span class="HS" id="hSB">0</span>
+      <span class="HN" id="hTB" style="color:#60a5fa;">BLUE</span>
+    </div>
+  </div>
+</div>
+<div id="MYINFO"><div class="MI"><div class="MDOT" id="myDot"></div><span id="myLabel"></span></div></div>
+
+<div id="GOAL"><div class="GB2"><div class="GT">⚽ GOAL!</div><div class="GW" id="gWho"></div></div></div>
+
+<div id="CTRL">
+  <div class="CR">
+    <div class="DP">
+      <div class="DBX"></div><div class="DB" id="cU">▲</div><div class="DBX"></div>
+      <div class="DB" id="cL">◀</div><div class="DBX"></div><div class="DB" id="cR">▶</div>
+      <div class="DBX"></div><div class="DB" id="cD">▼</div><div class="DBX"></div>
+    </div>
+    <div class="AC">
+      <div class="KB" id="cK">KICK</div>
+      <div class="SB" id="cS">RUN</div>
+    </div>
+  </div>
+</div>
+
+<div id="END">
+  <div class="EF">FULL TIME</div>
+  <div class="ES" id="eSc">0 — 0</div>
+  <div class="EW" id="eWin"></div>
+  <button class="EB" onclick="backMenu()">MAIN MENU</button>
+</div>
+<div id="PING"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════
+//  CANVAS
+// ════════════════════════════════════════════════════════════
+const CVS=document.getElementById('C'), CTX=CVS.getContext('2d');
+let VW=800,VH=500;
+function resize(){VW=window.innerWidth;VH=window.innerHeight;CVS.width=VW;CVS.height=VH;}
+resize(); window.addEventListener('resize',resize);
+
+// ════════════════════════════════════════════════════════════
+//  FIELD GEOMETRY (logical 800×500 space)
+// ════════════════════════════════════════════════════════════
+const F={x:44,y:54,w:712,h:392};
+const GH=112, GD=24, PR=13, BR=9;
+
+// ════════════════════════════════════════════════════════════
+//  PHYSICS
+// ════════════════════════════════════════════════════════════
+const PH={
+  accel:950,      // px/s² — how fast player speeds up
+  maxSpd:195,     // px/s normal
+  sprint:1.55,    // sprint multiplier
+  drag:0.88,      // velocity multiplier per 60fps tick when moving
+  stopDrag:0.80,  // velocity multiplier per 60fps tick when stopped
+  ballFric:0.018, // fraction of ball speed lost per tick
+  bounce:0.52,
+  kickSpd:700,
+  pushSpd:165,
+  kickCD:0.32,
+};
+
+// ════════════════════════════════════════════════════════════
+//  KEYBOARD
+// ════════════════════════════════════════════════════════════
+const K={};
+window.addEventListener('keydown',e=>{K[e.key]=true;if(e.key===' ')e.preventDefault();});
+window.addEventListener('keyup',  e=>{K[e.key]=false;});
+
+// LOCAL CONTROL SCHEMES — indexed by slot (0..9)
+// Slot = position in full player list (Red0,Blue0,Red1,Blue1,Red2,Blue2...)
+const LOCAL_CTRL=[
+  {up:'w',    dn:'s',    lf:'a',    rt:'d',        kick:' ',     spr:'Shift'},  // Red P1
+  {up:'ArrowUp',dn:'ArrowDown',lf:'ArrowLeft',rt:'ArrowRight',kick:'Enter',spr:'Control'}, // Blue P1
+  {up:'t',    dn:'g',    lf:'f',    rt:'h',        kick:'y',     spr:'r'},      // Red P2
+  {up:'i',    dn:'k',    lf:'j',    rt:'l',        kick:'o',     spr:'u'},      // Blue P2
+  {up:'8',    dn:'5',    lf:'4',    rt:'6',        kick:'0',     spr:'9'},      // Red P3  (numpad)
+  {up:'[',    dn:"'",    lf:';',    rt:'\\',       kick:']',     spr:'p'},      // Blue P3
+  {up:'e',    dn:'c',    lf:'q',    rt:'r_',       kick:'z',     spr:'x'},      // Red P4 (fallback)
+  {up:'7',    dn:'1',    lf:'4_',   rt:'3',        kick:'.',     spr:'/'},      // Blue P4
+  {up:'F1',   dn:'F2',   lf:'F3',   rt:'F4',       kick:'F5',    spr:'F6'},     // Red P5
+  {up:'F7',   dn:'F8',   lf:'F9',   rt:'F10',      kick:'F11',   spr:'F12'},    // Blue P5
+];
+
+const CTRL_LABELS=[
+  '🔴 Red P1: WASD + Space (kick) + Shift (sprint)',
+  '🔵 Blue P1: Arrows + Enter (kick) + Ctrl (sprint)',
+  '🔴 Red P2: TFGH + Y (kick) + R (sprint)',
+  '🔵 Blue P2: IJKL + O (kick) + U (sprint)',
+  '🔴 Red P3: Numpad 8456 + 0 (kick) + 9 (sprint)',
+  '🔵 Blue P3: ;\'[]\\ keys',
+  '🔴 Red P4: EQRZ + Z (kick)',
+  '🔵 Blue P4: Numpad 7134',
+  '🔴 Red P5: F1-F5',
+  '🔵 Blue P5: F7-F12',
+];
+
+// TOUCH
+const TK={up:0,dn:0,lf:0,rt:0,kick:0,spr:0};
+function bindT(id,k){
+  const el=document.getElementById(id);if(!el)return;
+  const on=e=>{e.preventDefault();TK[k]=1;el.classList.add('DN');};
+  const off=e=>{e.preventDefault();TK[k]=0;el.classList.remove('DN');};
+  el.addEventListener('touchstart',on,{passive:false});
+  el.addEventListener('touchend',off,{passive:false});
+  el.addEventListener('touchcancel',off,{passive:false});
+  el.addEventListener('mousedown',on);
+  el.addEventListener('mouseup',off);
+  el.addEventListener('mouseleave',off);
+}
+bindT('cU','up');bindT('cD','dn');bindT('cL','lf');bindT('cR','rt');
+bindT('cK','kick');bindT('cS','spr');
+
+// ════════════════════════════════════════════════════════════
+//  GAME STATE
+// ════════════════════════════════════════════════════════════
+const G={
+  run:false, pause:0, timer:120, sA:0, sB:0,
+  players:[], ball:null,
+  mode:'local',    // 'local' | 'host' | 'guest'
+  myIdx:-1,        // which player index am I (for online)
+};
+
+// ════════════════════════════════════════════════════════════
+//  PLAYER
+// ════════════════════════════════════════════════════════════
+const YOFFS={1:[0],2:[-80,80],3:[-108,0,108],4:[-120,-40,40,120],5:[-130,-68,0,68,130]};
+
+function mkP(x,y,team,name,slot,teamIdx){
+  return{x,y,vx:0,vy:0,team,name,slot,teamIdx,kcd:0,bx:x,by:y,
+    // Interpolation targets (for guests)
+    tx:x,ty:y};
+}
+
+function initGame(n,secs,players){
+  // players = [{name,team}...] ordered
+  G.sA=0;G.sB=0;G.timer=secs;G.pause=0;G.run=true;
+  const mx=F.x+F.w/2, my=F.y+F.h/2;
+  const off=YOFFS[n]||YOFFS[1];
+  G.players=[];
+  let ai=0, bi=0;
+  players.forEach((p,slot)=>{
+    const isA=p.team==='A';
+    const tidx=isA?ai++:bi++;
+    const x=isA?mx-160:mx+160;
+    const y=my+off[tidx];
+    G.players.push(mkP(x,y,p.team,p.name,slot,tidx));
+  });
+  G.ball={x:mx,y:my,vx:0,vy:0,last:null};
+}
+
+function resetPos(){
+  const mx=F.x+F.w/2, my=F.y+F.h/2;
+  G.players.forEach(p=>{p.x=p.bx;p.y=p.by;p.tx=p.bx;p.ty=p.by;p.vx=0;p.vy=0;});
+  G.ball.x=mx;G.ball.y=my;G.ball.vx=0;G.ball.vy=0;
+}
+
+// ════════════════════════════════════════════════════════════
+//  INPUT
+// ════════════════════════════════════════════════════════════
+function getInput(p){
+  if(G.mode==='local'){
+    const c=LOCAL_CTRL[p.slot];
+    if(!c) return null;
+    const isMine=true; // all local players are "mine"
+    const isTouch='ontouchstart'in window;
+    // First red player gets touch controls too
+    const useTouch=isTouch&&p.slot===0;
+    return{
+      up:!!(K[c.up]   ||(useTouch?TK.up:0)),
+      dn:!!(K[c.dn]   ||(useTouch?TK.dn:0)),
+      lf:!!(K[c.lf]   ||(useTouch?TK.lf:0)),
+      rt:!!(K[c.rt]   ||(useTouch?TK.rt:0)),
+      kick:!!(K[c.kick]||(useTouch?TK.kick:0)),
+      spr:!!(K[c.spr] ||(useTouch?TK.spr:0)),
+    };
+  }
+  if(G.mode==='host'){
+    if(p.slot===G.myIdx){
+      // Host's own player — keyboard + touch
+      return myLocalInput();
+    }
+    // Other players — use stored remote inputs
+    return remInputs[p.slot]||null;
+  }
+  if(G.mode==='guest'){
+    if(p.slot===G.myIdx){
+      return myLocalInput();
+    }
+    return null; // will be set by host state
+  }
+  return null;
+}
+
+function myLocalInput(){
+  const isT='ontouchstart'in window;
+  return{
+    up:!!(K['w']||K['W']||K['ArrowUp']   ||(isT?TK.up:0)),
+    dn:!!(K['s']||K['S']||K['ArrowDown'] ||(isT?TK.dn:0)),
+    lf:!!(K['a']||K['A']||K['ArrowLeft'] ||(isT?TK.lf:0)),
+    rt:!!(K['d']||K['D']||K['ArrowRight']||(isT?TK.rt:0)),
+    kick:!!(K[' ']||K['Enter']           ||(isT?TK.kick:0)),
+    spr:!!(K['Shift']||K['Control']      ||(isT?TK.spr:0)),
+  };
+}
+
+// ════════════════════════════════════════════════════════════
+//  GAME LOOP
+// ════════════════════════════════════════════════════════════
+let RAF=null, lastT=0;
+function startLoop(){if(RAF)cancelAnimationFrame(RAF);lastT=0;RAF=requestAnimationFrame(tick);}
+function tick(ts){
+  const dt=Math.min((ts-lastT)/1000,0.05);lastT=ts;
+  if(G.run) update(dt);
+  render();
+  RAF=requestAnimationFrame(tick);
+}
+
+// ════════════════════════════════════════════════════════════
+//  UPDATE
+// ════════════════════════════════════════════════════════════
+function update(dt){
+  if(G.pause>0){G.pause-=dt;if(G.pause<=0){G.pause=0;resetPos();}return;}
+  G.timer=Math.max(0,G.timer-dt);
+  const m=Math.floor(G.timer/60),s=Math.floor(G.timer%60);
+  document.getElementById('hTim').textContent=m+':'+(s<10?'0':'')+s;
+  if(G.timer<=0){G.run=false;triggerEnd();return;}
+
+  // Guest: only simulate their own player locally for responsiveness
+  // Host & Local: simulate all players
+  const simAll=(G.mode==='host'||G.mode==='local');
+
+  G.players.forEach(p=>{
+    const isMyPlayer=p.slot===G.myIdx;
+    if(!simAll&&!isMyPlayer) return; // guest skips others (they come from host state)
+
+    const inp=getInput(p);
+    if(!inp) return;
+
+    // Smooth physics
+    const maxV=PH.maxSpd*(inp.spr?PH.sprint:1);
+    let ax=0,ay=0;
+    if(inp.lf)ax-=PH.accel;
+    if(inp.rt)ax+=PH.accel;
+    if(inp.up)ay-=PH.accel;
+    if(inp.dn)ay+=PH.accel;
+    if(ax&&ay){ax*=0.7071;ay*=0.7071;}
+
+    p.vx+=ax*dt;
+    p.vy+=ay*dt;
+
+    const any=inp.up||inp.dn||inp.lf||inp.rt;
+    const dk=any?PH.drag:PH.stopDrag;
+    // dt-normalised drag
+    const df=Math.pow(dk,dt*60);
+    p.vx*=df; p.vy*=df;
+
+    const spd=Math.hypot(p.vx,p.vy);
+    if(spd>maxV){const r=maxV/spd;p.vx*=r;p.vy*=r;}
+    if(Math.abs(p.vx)<0.3)p.vx=0;
+    if(Math.abs(p.vy)<0.3)p.vy=0;
+
+    p.x+=p.vx*dt;
+    p.y+=p.vy*dt;
+    p.x=Math.max(F.x+PR,Math.min(F.x+F.w-PR,p.x));
+    p.y=Math.max(F.y+PR,Math.min(F.y+F.h-PR,p.y));
+    if(p.kcd>0)p.kcd-=dt;
+
+    // Ball interaction (only host & local simulate this authoritatively)
+    if(simAll||isMyPlayer){
+      const dx=G.ball.x-p.x,dy=G.ball.y-p.y,d=Math.hypot(dx,dy),min=PR+BR+2;
+      if(d<min&&d>0.1){
+        G.ball.last=p;
+        const ang=Math.atan2(dy,dx),ca=Math.cos(ang),sa=Math.sin(ang);
+        const ov=min-d;
+        G.ball.x+=ca*ov;G.ball.y+=sa*ov;
+        if(inp.kick&&p.kcd<=0){
+          G.ball.vx=ca*PH.kickSpd;G.ball.vy=sa*PH.kickSpd;
+          p.kcd=PH.kickCD;
+        } else {
+          G.ball.vx+=ca*PH.pushSpd*dt*60;
+          G.ball.vy+=sa*PH.pushSpd*dt*60;
+        }
+      }
+    }
+  });
+
+  // Ball physics (host & local only)
+  if(simAll){
+    const b=G.ball,sp=Math.hypot(b.vx,b.vy);
+    if(sp>0){
+      const loss=sp*PH.ballFric*dt*60;
+      const ns=Math.max(0,sp-loss);
+      if(ns<0.5){b.vx=0;b.vy=0;}
+      else{const r=ns/sp;b.vx*=r;b.vy*=r;}
+    }
+    b.x+=b.vx*dt; b.y+=b.vy*dt;
+    if(b.x-BR<F.x){b.x=F.x+BR;b.vx=Math.abs(b.vx)*PH.bounce;}
+    if(b.x+BR>F.x+F.w){b.x=F.x+F.w-BR;b.vx=-Math.abs(b.vx)*PH.bounce;}
+    if(b.y-BR<F.y){b.y=F.y+BR;b.vy=Math.abs(b.vy)*PH.bounce;}
+    if(b.y+BR>F.y+F.h){b.y=F.y+F.h-BR;b.vy=-Math.abs(b.vy)*PH.bounce;}
+
+    // Goals
+    const gy=F.y+F.h/2-GH/2;
+    if(b.x-BR<=F.x&&b.y>gy&&b.y<gy+GH){
+      G.sB++;document.getElementById('hSB').textContent=G.sB;
+      onGoal(b.last?b.last.name:'');return;
+    }
+    if(b.x+BR>=F.x+F.w&&b.y>gy&&b.y<gy+GH){
+      G.sA++;document.getElementById('hSA').textContent=G.sA;
+      onGoal(b.last?b.last.name:'');return;
+    }
+
+    // Player collisions
+    const pl=G.players;
+    for(let i=0;i<pl.length;i++) for(let j=i+1;j<pl.length;j++){
+      const a=pl[i],b2=pl[j];
+      const dx=b2.x-a.x,dy=b2.y-a.y,d=Math.hypot(dx,dy),min=PR*2;
+      if(d<min&&d>0.1){
+        const ov=(min-d)/2,nx=dx/d,ny=dy/d;
+        a.x-=nx*ov;a.y-=ny*ov;b2.x+=nx*ov;b2.y+=ny*ov;
+        const dv=(a.vx-b2.vx)*nx+(a.vy-b2.vy)*ny;
+        if(dv>0){a.vx-=dv*nx*0.45;a.vy-=dv*ny*0.45;b2.vx+=dv*nx*0.45;b2.vy+=dv*ny*0.45;}
+      }
+    }
+
+    // Host broadcasts full state to all guests
+    if(G.mode==='host') broadcastState();
+  }
+
+  // Guest: lerp other players from received state
+  if(G.mode==='guest'){
+    G.players.forEach(p=>{
+      if(p.slot===G.myIdx) return; // don't lerp my own player
+      p.x+=(p.tx-p.x)*0.3;
+      p.y+=(p.ty-p.y)*0.3;
+    });
+    if(G.ball){
+      G.ball.x+=(G.ball.tx-G.ball.x)*0.3;
+      G.ball.y+=(G.ball.ty-G.ball.y)*0.3;
+    }
+    // Guest sends input to host
+    const myP=G.players[G.myIdx];
+    if(myP) sendToHost({t:'I',slot:G.myIdx,k:myLocalInput()});
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  NETWORK (PeerJS — Host is server, guests connect to host)
+// ════════════════════════════════════════════════════════════
+let peer=null;
+let hostConn=null;          // guest's connection to host
+let guestConns={};          // host's connections: slot->conn
+let remInputs={};           // host stores: slot->input
+let lobbyPlayers=[];        // [{name,team,conn,slot}]
+let myTeamChoice='A';
+let jTeamChoice='B';
+let cMode=1,cTime=120;
+
+function genCode(){return Array.from({length:4},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*24)]).join('');}
+function myName(){return document.getElementById('myName').value.trim()||'Player';}
+
+async function mkPeer(id){
+  return new Promise((res,rej)=>{
+    const p=id?new Peer(id,{debug:0}):new Peer({debug:0});
+    p.on('open',id2=>{peer=p;res(id2);});
+    p.on('error',rej);
+  });
+}
+
+// ── HOST ──────────────────────────────────────────────────
+async function createRoom(){
+  const name=myName();
+  go('sWait');
+  document.getElementById('wMsg').textContent='Creating room...';
+  document.getElementById('wCode').style.display='none';
+  document.getElementById('wCopy').style.display='none';
+
+  const code=genCode();
+  try{
+    await mkPeer('kof5-'+code);
+  }catch(e){
+    document.getElementById('wMsg').textContent='Error: '+e.message; return;
+  }
+
+  G.mode='host'; G.myIdx=0;
+  // Host is slot 0, team = myTeamChoice
+  lobbyPlayers=[{name,team:myTeamChoice,slot:0}];
+  updateLobbyUI();
+
+  document.getElementById('wCode').textContent=code;
+  document.getElementById('wCode').style.display='block';
+  document.getElementById('wCopy').style.display='inline-block';
+  document.getElementById('wMsg').textContent='Share this code with all players:';
+  document.getElementById('pMax').textContent=cMode*2;
+
+  peer.on('connection',conn=>{
+    conn.on('open',()=>{
+      // Tell new guest the current lobby + settings
+      conn.send({t:'LOBBY_INFO',players:lobbyPlayers,mode:cMode,time:cTime});
+    });
+    conn.on('data',d=>hostHandleMsg(d,conn));
+    conn.on('close',()=>{
+      // Remove disconnected player
+      lobbyPlayers=lobbyPlayers.filter(p=>p.conn!==conn);
+      reassignSlots();
+      broadcastLobby();
+    });
+  });
+}
+
+function hostHandleMsg(d,conn){
+  if(d.t==='JOIN'){
+    // Assign slot
+    const slot=lobbyPlayers.length;
+    lobbyPlayers.push({name:d.name,team:d.team,slot,conn});
+    reassignSlots();
+    conn.send({t:'JOINED',slot,players:lobbyPlayers.map(p=>({name:p.name,team:p.team,slot:p.slot}))});
+    broadcastLobby();
+    updateLobbyUI();
+  }
+  if(d.t==='I'){
+    // Store guest input
+    remInputs[d.slot]=d.k;
+  }
+}
+
+function reassignSlots(){
+  // Sort: team A first in teamIdx order, then team B
+  const a=lobbyPlayers.filter(p=>p.team==='A');
+  const b=lobbyPlayers.filter(p=>p.team==='B');
+  const sorted=[...a,...b].map((p,i)=>({...p,slot:i}));
+  // Re-map
+  lobbyPlayers=sorted;
+  // Tell each guest their new slot
+  lobbyPlayers.forEach(p=>{
+    if(p.conn) p.conn.send({t:'SLOT',slot:p.slot});
+  });
+  // Fix host slot
+  const h=lobbyPlayers.find(p=>!p.conn);
+  if(h) G.myIdx=h.slot;
+}
+
+function broadcastLobby(){
+  const data={t:'LOBBY',players:lobbyPlayers.map(p=>({name:p.name,team:p.team,slot:p.slot}))};
+  lobbyPlayers.forEach(p=>p.conn&&p.conn.open&&p.conn.send(data));
+  updateLobbyUI();
+}
+
+function broadcastState(){
+  const data={
+    t:'S',
+    p:G.players.map(p=>({x:~~(p.x*4)/4,y:~~(p.y*4)/4,vx:~~p.vx,vy:~~p.vy})),
+    bx:~~(G.ball.x*4)/4,by:~~(G.ball.y*4)/4,bvx:~~G.ball.vx,bvy:~~G.ball.vy,
+    sA:G.sA,sB:G.sB,timer:G.timer
+  };
+  lobbyPlayers.forEach(p=>p.conn&&p.conn.open&&p.conn.send(data));
+}
+
+function hostStart(){
+  if(lobbyPlayers.length<2){alert('Need at least 2 players!');return;}
+  const n=Math.max(
+    lobbyPlayers.filter(p=>p.team==='A').length,
+    lobbyPlayers.filter(p=>p.team==='B').length
+  );
+  const plist=lobbyPlayers.map(p=>({name:p.name,team:p.team}));
+  const startData={t:'START',players:plist,n,time:cTime};
+  lobbyPlayers.forEach(p=>p.conn&&p.conn.open&&p.conn.send(startData));
+  launchGame(plist,n,cTime,'host');
+}
+
+function sendToAll(data){
+  lobbyPlayers.forEach(p=>p.conn&&p.conn.open&&try_send(p.conn,data));
+}
+
+// ── GUEST ─────────────────────────────────────────────────
+async function joinRoom(){
+  const code=document.getElementById('jCode').value.trim().toUpperCase();
+  const name=myName()||document.getElementById('myName').value.trim()||'Guest';
+  if(code.length<4){jStat('Enter a valid 4-letter code!');return;}
+  document.getElementById('jBtn').disabled=true;
+  jStat('Connecting...');
+  try{
+    await mkPeer();
+  }catch(e){jStat('Peer error: '+e.message);document.getElementById('jBtn').disabled=false;return;}
+
+  hostConn=peer.connect('kof5-'+code,{reliable:true,serialization:'json'});
+  hostConn.on('open',()=>{
+    jStat('✓ Connected!');
+    hostConn.send({t:'JOIN',name,team:jTeamChoice});
+    go('sGWait');
+    document.getElementById('gWMsg').textContent='Waiting for host to start the match...';
+  });
+  hostConn.on('data',guestHandleMsg);
+  hostConn.on('error',e=>{jStat('❌ '+e.message);document.getElementById('jBtn').disabled=false;});
+  hostConn.on('close',()=>{
+    if(G.run){G.run=false;alert('Disconnected from host.');}
+  });
+}
+
+function sendToHost(data){
+  if(hostConn&&hostConn.open) try{hostConn.send(data);}catch(e){}
+}
+
+function guestHandleMsg(d){
+  if(d.t==='JOINED'){
+    G.myIdx=d.slot; G.mode='guest';
+    updateGuestLobby(d.players);
+  }
+  if(d.t==='SLOT'){G.myIdx=d.slot;}
+  if(d.t==='LOBBY'){updateGuestLobby(d.players);}
+  if(d.t==='LOBBY_INFO'){updateGuestLobby(d.players||[]);}
+  if(d.t==='START'){
+    launchGame(d.players,d.n,d.time,'guest');
+  }
+  if(d.t==='S'){
+    // Apply host state with interpolation
+    if(d.p) d.p.forEach((s,i)=>{
+      if(!G.players[i])return;
+      if(i===G.myIdx) return; // don't override my own predicted position
+      G.players[i].tx=s.x; G.players[i].ty=s.y;
+      G.players[i].vx=s.vx; G.players[i].vy=s.vy;
+    });
+    if(G.ball){G.ball.tx=d.bx;G.ball.ty=d.by;G.ball.vx=d.bvx||0;G.ball.vy=d.bvy||0;}
+    if(d.sA!==undefined){
+      if(d.sA!==G.sA){G.sA=d.sA;document.getElementById('hSA').textContent=G.sA;}
+      if(d.sB!==G.sB){G.sB=d.sB;document.getElementById('hSB').textContent=G.sB;}
+    }
+    if(d.timer!==undefined) G.timer=d.timer;
+  }
+  if(d.t==='GOAL'){showGoalAnim(d.who);}
+  if(d.t==='PAUSE'){G.pause=d.dur;resetPos();}
+  if(d.t==='END'){triggerEnd();}
+  if(d.t==='PING'){sendToHost({t:'PONG',ts:d.ts});}
+  if(d.t==='PONG'){
+    const ms=Date.now()-d.ts;
+    const pi=document.getElementById('PING');
+    pi.textContent='Ping: '+ms+'ms';
+    pi.style.color=ms<80?'#5dcaa5':ms<160?'#f6c90e':'#f87171';
+  }
+}
+
+// Ping to each guest
+setInterval(()=>{
+  if(G.mode==='host'&&G.run) lobbyPlayers.forEach(p=>{
+    if(p.conn&&p.conn.open) try_send(p.conn,{t:'PING',ts:Date.now()});
+  });
+},2500);
+
+function try_send(conn,data){try{conn.send(data);}catch(e){}}
+
+// ── LOBBY UI ──────────────────────────────────────────────
+const TEAM_COLORS={A:'#f87171',B:'#60a5fa'};
+const TEAM_BG={A:'rgba(229,62,62,0.2)',B:'rgba(49,130,206,0.2)'};
+
+function updateLobbyUI(){
+  const list=document.getElementById('lobbyList');
+  const need=cMode*2;
+  document.getElementById('pCount').textContent=lobbyPlayers.length;
+  document.getElementById('pMax').textContent=need;
+  list.innerHTML=lobbyPlayers.map(p=>`
+    <div class="LP">
+      <div class="LD" style="background:${TEAM_COLORS[p.team]}"></div>
+      <div>
+        <div class="LN">${esc(p.name)}</div>
+        <div class="LT">${p.team==='A'?'🔴 Red Team':'🔵 Blue Team'} · Slot ${p.slot+1}</div>
+      </div>
+      ${!p.conn?'<div class="LY" style="background:rgba(246,201,14,0.2);color:var(--gold);">HOST</div>':''}
+    </div>`).join('');
+  const btn=document.getElementById('startBtn');
+  if(lobbyPlayers.length>=2){
+    btn.disabled=false;
+    btn.textContent='START MATCH ▶ ('+lobbyPlayers.length+' players)';
+  } else {
+    btn.disabled=true;
+    btn.textContent='Waiting for players... ('+lobbyPlayers.length+'/'+need+')';
+  }
+}
+
+function updateGuestLobby(players){
+  document.getElementById('gLobbyList').innerHTML=players.map(p=>`
+    <div class="LP">
+      <div class="LD" style="background:${TEAM_COLORS[p.team]}"></div>
+      <div>
+        <div class="LN">${esc(p.name)} ${p.slot===G.myIdx?'<span style="color:var(--gold)">(You)</span>':''}</div>
+        <div class="LT">${p.team==='A'?'🔴 Red Team':'🔵 Blue Team'}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── LAUNCH ────────────────────────────────────────────────
+function launchGame(players, n, secs, mode){
+  G.mode=mode;
+  initGame(n, secs, players);
+  // Ball needs tx/ty for guest interpolation
+  if(G.ball){G.ball.tx=G.ball.x;G.ball.ty=G.ball.y;}
+
+  // Show HUD
+  document.getElementById('OV').classList.add('H');
+  document.getElementById('HUD').style.display='block';
+  document.getElementById('CTRL').style.display='block';
+
+  // Show my player info
+  const me=players[G.myIdx]||players[0];
+  if(me){
+    document.getElementById('myDot').style.background=TEAM_COLORS[me.team];
+    document.getElementById('myLabel').textContent=me.name+' · '+(me.team==='A'?'Red':'Blue')+' Team';
+    document.getElementById('MYINFO').style.display='block';
+    setTimeout(()=>document.getElementById('MYINFO').style.display='none',4000);
+  }
+
+  // Team names in HUD
+  const rTeam=players.filter(p=>p.team==='A').map(p=>p.name)[0]||'Red';
+  const bTeam=players.filter(p=>p.team==='B').map(p=>p.name)[0]||'Blue';
+  document.getElementById('hTA').textContent=rTeam.substring(0,10).toUpperCase();
+  document.getElementById('hTB').textContent=bTeam.substring(0,10).toUpperCase();
+  document.getElementById('hSA').textContent='0';
+  document.getElementById('hSB').textContent='0';
+
+  if(mode!=='local') document.getElementById('PING').style.display='block';
+  startLoop();
+}
+
+// ── LOCAL ─────────────────────────────────────────────────
+let lMode=1,lTime=120;
+function startLocal(){
+  const n=lMode;
+  const players=[];
+  for(let i=0;i<n;i++){
+    players.push({name:gv('lA'+i,'Red '+(i+1)),team:'A'});
+    players.push({name:gv('lB'+i,'Blue '+(i+1)),team:'B'});
+  }
+  G.myIdx=0; // local: myIdx doesn't matter much
+  launchGame(players, n, lTime, 'local');
+}
+
+// ════════════════════════════════════════════════════════════
+//  GOAL / END
+// ════════════════════════════════════════════════════════════
+function onGoal(who){
+  showGoalAnim(who);
+  const data={t:'GOAL',who};
+  if(G.mode==='host') lobbyPlayers.forEach(p=>p.conn&&try_send(p.conn,data));
+  G.pause=2.5;
+  // Tell guests to pause too
+  if(G.mode==='host') lobbyPlayers.forEach(p=>p.conn&&try_send(p.conn,{t:'PAUSE',dur:2.5}));
+}
+function showGoalAnim(who){
+  document.getElementById('gWho').textContent=who?who+' scores!':'';
+  const g=document.getElementById('GOAL');
+  g.style.display='flex';
+  setTimeout(()=>g.style.display='none',2200);
+}
+function triggerEnd(){
+  G.run=false;
+  if(G.mode==='host') lobbyPlayers.forEach(p=>p.conn&&try_send(p.conn,{t:'END'}));
+  document.getElementById('eSc').textContent=G.sA+' — '+G.sB;
+  document.getElementById('eWin').textContent=G.sA>G.sB?'🏆 Red Team Wins!':G.sB>G.sA?'🏆 Blue Team Wins!':'🤝 It\'s a Draw!';
+  document.getElementById('END').style.display='flex';
+}
+function backMenu(){
+  G.run=false;
+  ['END','HUD','CTRL','MYINFO'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('PING').style.display='none';
+  document.getElementById('OV').classList.remove('H');
+  if(hostConn){try{hostConn.close();}catch(e){}hostConn=null;}
+  if(peer){try{peer.destroy();}catch(e){}peer=null;}
+  lobbyPlayers=[];guestConns={};remInputs={};G.players=[];G.ball=null;
+  document.getElementById('jBtn').disabled=false;
+  go('sMain');
+}
+
+// ════════════════════════════════════════════════════════════
+//  SCREEN + PILL + UTILS
+// ════════════════════════════════════════════════════════════
+function go(id){document.querySelectorAll('.SCR').forEach(s=>s.classList.remove('A'));document.getElementById(id).classList.add('A');}
+function leaveRoom(){if(peer){try{peer.destroy();}catch(e){}peer=null;}hostConn=null;lobbyPlayers=[];go('sMain');}
+function copyCode(){navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('wCode').textContent).then(()=>{document.getElementById('wCopy').textContent='✓ Copied!';setTimeout(()=>document.getElementById('wCopy').textContent='📋 Copy Code',1600);});}
+function gv(id,def){const e=document.getElementById(id);return e&&e.value.trim()?e.value.trim():def;}
+function esc(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function jStat(m){document.getElementById('jStat').textContent=m;}
+
+function pickTeam(t){
+  myTeamChoice=t;
+  document.getElementById('tRA').className='TBTN'+(t==='A'?' RA':'');
+  document.getElementById('tRB').className='TBTN'+(t==='B'?' BA':'');
+}
+function jPickTeam(t){
+  jTeamChoice=t;
+  document.getElementById('jTA').className='TBTN'+(t==='A'?' RA':'');
+  document.getElementById('jTB').className='TBTN'+(t==='B'?' BA':'');
+}
+
+function goCreate(){
+  // Validate name
+  if(!document.getElementById('myName').value.trim()){
+    document.getElementById('myName').focus();
+    document.getElementById('myName').style.borderColor='#e53e3e';
+    setTimeout(()=>document.getElementById('myName').style.borderColor='',1500);
+    return;
+  }
+  go('sCreate');
+}
+
+// Pills
+function pills(pid,cb){
+  document.getElementById(pid).querySelectorAll('.PILL').forEach(p=>{
+    p.addEventListener('click',()=>{
+      document.getElementById(pid).querySelectorAll('.PILL').forEach(x=>x.classList.remove('ON'));
+      p.classList.add('ON');cb(+p.dataset.v);
+    });
+  });
+}
+pills('cMP',v=>cMode=v);
+pills('cTP',v=>cTime=v);
+pills('lMP',v=>{lMode=v;buildLN();});
+pills('lTP',v=>lTime=v);
+
+// Local names
+function buildLN(){
+  const g=document.getElementById('lNames');g.innerHTML='';
+  const cr=document.getElementById('ctrlRef');cr.innerHTML='';
+  for(let i=0;i<lMode;i++){
+    const r=document.createElement('div');r.className='NR';
+    r.innerHTML=`<div class="ND" style="background:#ef4444"></div>
+      <input class="NI" id="lA${i}" placeholder="Red ${i+1}" maxlength="12">
+      <div class="ND" style="background:#3b82f6"></div>
+      <input class="NI" id="lB${i}" placeholder="Blue ${i+1}" maxlength="12">`;
+    g.appendChild(r);
+    // Add control hints for each pair
+    const rSlot=i*2, bSlot=i*2+1;
+    if(CTRL_LABELS[rSlot]) cr.innerHTML+=CTRL_LABELS[rSlot]+'<br>';
+    if(CTRL_LABELS[bSlot]) cr.innerHTML+=CTRL_LABELS[bSlot]+'<br>';
+  }
+}
+buildLN();
+
+// ════════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════════
+let bSpin=0;
+function render(){
+  CTX.clearRect(0,0,VW,VH);
+  CTX.save();
+  const sc=Math.min(VW/800,VH/500);
+  const ox=(VW-800*sc)/2,oy=(VH-500*sc)/2;
+  CTX.translate(ox,oy);CTX.scale(sc,sc);
+  drawBG();drawField();
+  if(G.players.length){drawGoals();G.players.forEach(p=>drawPlayer(p));if(G.ball)drawBall();}
+  CTX.restore();
+}
+
+function drawBG(){
+  CTX.fillStyle='#0c3a0c';CTX.fillRect(0,0,800,500);
+}
+
+function drawField(){
+  const sw=F.w/12;
+  for(let i=0;i<12;i++){
+    CTX.fillStyle=i%2===0?'#1e7c1e':'#1a721a';
+    CTX.fillRect(F.x+i*sw,F.y,sw,F.h);
+  }
+  CTX.strokeStyle='rgba(255,255,255,0.7)';CTX.lineWidth=2.5;
+  CTX.strokeRect(F.x,F.y,F.w,F.h);
+  const mx=F.x+F.w/2,my=F.y+F.h/2;
+  CTX.beginPath();CTX.moveTo(mx,F.y);CTX.lineTo(mx,F.y+F.h);CTX.stroke();
+  CTX.beginPath();CTX.arc(mx,my,56,0,Math.PI*2);CTX.stroke();
+  CTX.fillStyle='rgba(255,255,255,0.72)';CTX.beginPath();CTX.arc(mx,my,4,0,Math.PI*2);CTX.fill();
+  const pw=90,ph=172,pw2=44,ph2=88;
+  CTX.strokeRect(F.x,my-ph/2,pw,ph);CTX.strokeRect(F.x+F.w-pw,my-ph/2,pw,ph);
+  CTX.strokeRect(F.x,my-ph2/2,pw2,ph2);CTX.strokeRect(F.x+F.w-pw2,my-ph2/2,pw2,ph2);
+  CTX.fillStyle='rgba(255,255,255,0.7)';
+  CTX.beginPath();CTX.arc(F.x+62,my,3.5,0,Math.PI*2);CTX.fill();
+  CTX.beginPath();CTX.arc(F.x+F.w-62,my,3.5,0,Math.PI*2);CTX.fill();
+  CTX.lineWidth=2;
+  CTX.beginPath();CTX.arc(F.x+62,my,40,-0.64,0.64);CTX.stroke();
+  CTX.beginPath();CTX.arc(F.x+F.w-62,my,40,Math.PI-0.64,Math.PI+0.64);CTX.stroke();
+  [[F.x,F.y],[F.x+F.w,F.y],[F.x,F.y+F.h],[F.x+F.w,F.y+F.h]].forEach(([cx,cy])=>{CTX.beginPath();CTX.arc(cx,cy,10,0,Math.PI*2);CTX.stroke();});
+}
+
+function drawGoals(){
+  const gy=F.y+F.h/2-GH/2;
+  CTX.fillStyle='rgba(239,68,68,0.14)';CTX.fillRect(F.x-GD,gy,GD,GH);
+  CTX.strokeStyle='rgba(255,255,255,0.9)';CTX.lineWidth=3;CTX.strokeRect(F.x-GD,gy,GD,GH);
+  drawNet(F.x-GD,gy,GD,GH);
+  CTX.fillStyle='rgba(59,130,246,0.14)';CTX.fillRect(F.x+F.w,gy,GD,GH);
+  CTX.strokeStyle='rgba(255,255,255,0.9)';CTX.strokeRect(F.x+F.w,gy,GD,GH);
+  drawNet(F.x+F.w,gy,GD,GH);
+}
+function drawNet(gx,gy,gw,gh){
+  CTX.strokeStyle='rgba(255,255,255,0.18)';CTX.lineWidth=0.8;
+  for(let i=1;i<6;i++){CTX.beginPath();CTX.moveTo(gx,gy+i*gh/6);CTX.lineTo(gx+gw,gy+i*gh/6);CTX.stroke();}
+  for(let i=1;i<4;i++){CTX.beginPath();CTX.moveTo(gx+i*gw/4,gy);CTX.lineTo(gx+i*gw/4,gy+gh);CTX.stroke();}
+}
+
+function drawPlayer(p){
+  const isA=p.team==='A';
+  const mc=isA?'#e53e3e':'#3182ce';
+  const dc=isA?'#7f1d1d':'#1a365d';
+  const isMe=G.mode!=='local'&&p.slot===G.myIdx;
+
+  // Glow for my player
+  if(isMe){
+    CTX.beginPath();CTX.arc(p.x,p.y,PR+5,0,Math.PI*2);
+    CTX.fillStyle=isA?'rgba(229,62,62,0.25)':'rgba(49,130,206,0.25)';CTX.fill();
+  }
+
+  CTX.beginPath();CTX.ellipse(p.x+2,p.y+PR+3,PR*0.8,5,0,0,Math.PI*2);
+  CTX.fillStyle='rgba(0,0,0,0.22)';CTX.fill();
+  CTX.beginPath();CTX.arc(p.x,p.y,PR,0,Math.PI*2);CTX.fillStyle=dc;CTX.fill();
+  CTX.beginPath();CTX.arc(p.x,p.y,PR-2,0,Math.PI*2);CTX.fillStyle=mc;CTX.fill();
+  CTX.beginPath();CTX.arc(p.x-4,p.y-5,4,0,Math.PI*2);CTX.fillStyle='rgba(255,255,255,0.15)';CTX.fill();
+
+  // Number
+  CTX.fillStyle='#fff';CTX.textAlign='center';CTX.textBaseline='middle';
+  CTX.font='bold 9px Inter,system-ui';
+  CTX.fillText(p.teamIdx+1,p.x,p.y);
+
+  // Name tag
+  const nm=p.name.substring(0,8);
+  CTX.font='700 8px Inter,system-ui';
+  const tw=CTX.measureText(nm).width;
+  CTX.fillStyle='rgba(0,0,0,0.65)';
+  CTX.beginPath();
+  if(CTX.roundRect) CTX.roundRect(p.x-tw/2-4,p.y-PR-18,tw+8,13,4);
+  else CTX.rect(p.x-tw/2-4,p.y-PR-18,tw+8,13);
+  CTX.fill();
+  CTX.fillStyle=isMe?'#f6c90e':'#fff';
+  CTX.fillText(nm,p.x,p.y-PR-12);
+}
+
+function drawBall(){
+  const b=G.ball;
+  bSpin+=Math.hypot(b.vx,b.vy)*0.003;
+  CTX.beginPath();CTX.ellipse(b.x+2,b.y+BR+3,BR*0.85,4,0,0,Math.PI*2);
+  CTX.fillStyle='rgba(0,0,0,0.24)';CTX.fill();
+  CTX.beginPath();CTX.arc(b.x,b.y,BR,0,Math.PI*2);
+  CTX.fillStyle='#f5f5f5';CTX.fill();
+  CTX.save();CTX.translate(b.x,b.y);CTX.rotate(bSpin);
+  CTX.fillStyle='rgba(20,20,20,0.55)';
+  CTX.beginPath();
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;i===0?CTX.moveTo(Math.cos(a)*4,Math.sin(a)*4):CTX.lineTo(Math.cos(a)*4,Math.sin(a)*4);}
+  CTX.closePath();CTX.fill();
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;CTX.beginPath();CTX.arc(Math.cos(a)*6,Math.sin(a)*6,2.5,0,Math.PI*2);CTX.fill();}
+  CTX.restore();
+  CTX.beginPath();CTX.arc(b.x,b.y,BR,0,Math.PI*2);
+  CTX.strokeStyle='rgba(30,30,30,0.5)';CTX.lineWidth=1;CTX.stroke();
+}
+
+startLoop();
+</script>
+</body>
+</html>
